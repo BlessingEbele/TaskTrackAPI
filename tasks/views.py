@@ -40,11 +40,17 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .models import Task
 from .serializers import TaskSerializer
+from rest_framework import permissions
 
 # View for listing and creating tasks
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Automatically assign the logged-in user to the task
+        serializer.save(user=self.request.user)
 
 # View for retrieving, updating, and deleting a single task
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
